@@ -32,13 +32,13 @@ class updateUser(APIView):
         try:
             if not request.user.is_authenticated:
                 return Response({'Status': 'Failed',"Message": "Please login before updating user"}, status=status.HTTP_400_BAD_REQUEST)
-            username = request.data.get("username")
-            u = User.objects.get(username=username)
+            new_password = request.data.get("new_password")
+            u = User.objects.get(username=request.user.username)
             if not u:
-                return Response({'Status': 'Failed',"Message": f"{username} doesn't exists"}, status=status.HTTP_403_FORBIDDEN)
-            u.set_password('new password')
+                return Response({'Status': 'Failed',"Message": f"{request.user.username} doesn't exists"}, status=status.HTTP_403_FORBIDDEN)
+            u.set_password(new_password)
             u.save()
-            return Response({'Status': 'Success',"Message": f"{username} updated successfully"}, status=status.HTTP_200_OK)
+            return Response({'Status': 'Success',"Message": f"{request.user.username} updated successfully"}, status=status.HTTP_200_OK)
             
         except:
             return Response({'Status': 'Failed', "Error": "Some Internal Error Occured"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -79,13 +79,14 @@ class logoutUser(APIView):
 
 
 class deleteUser(APIView):
-    def post(self, request):
+    def get(self, request):
         try:
+            k = request.user.username
             if request.user.is_authenticated:
-                u = User.objects.get(username = request.user.username)
+                u = User.objects.get(username =k)
                 logout(request)
                 u.delete()
-                return Response({'Status': 'Success',"Message": "User Deleted Successfully"}, status=status.HTTP_200_OK)
+                return Response({'Status': 'Success',"Message": f"{k} has been deleted Successfully"}, status=status.HTTP_200_OK)
             else:
                 return Response({'Status': 'Failed',"Message": "Please login before deleting user"}, status=status.HTTP_400_BAD_REQUEST)
         except:

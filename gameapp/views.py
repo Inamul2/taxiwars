@@ -7,7 +7,7 @@ from .serializers import GameDataSerializer
 
 
 class createBoard(APIView):
-    def post(self, request):
+    def get(self, request):
         if request.user.is_authenticated:
             try:
                 game = GameData.objects.create(value="")
